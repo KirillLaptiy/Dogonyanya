@@ -9,13 +9,14 @@ public enum AIState
 
 class AIController : MonoBehaviour
 {
-    public AIState currentStateEnum;
-
     [Header("States")]
     public AStarChase chase;
     public AStarFlee flee;
     public AStarSearch search;
 
+    private AIState currentStateEnum = AIState.Search;
+
+    private AIStateBase lastActiveState;
 
     void Update()
     {
@@ -35,9 +36,25 @@ class AIController : MonoBehaviour
 
         if (activeState)
         {
-            print(activeState);
             activeState.enabled = true;
+
+            if (activeState != lastActiveState)
+            {
+                activeState.OnStateEnter();
+                lastActiveState = activeState;
+            }
+
             activeState.Tick();
         }
+    }
+
+    public void SetAIState(AIState state)
+    {
+        currentStateEnum = state;
+    }
+
+    public AIState GetAIState()
+    {
+        return currentStateEnum;
     }
 }

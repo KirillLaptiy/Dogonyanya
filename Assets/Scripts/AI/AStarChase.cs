@@ -21,6 +21,10 @@ public class AStarChase : AIStateBase
             target = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
 
+    public override void OnStateEnter()
+    {
+    }
+
     public override void Tick()
     {
         if (target == null || groundTilemap == null || obstacleTilemap == null)

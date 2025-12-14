@@ -7,7 +7,7 @@ public class AStarSearch : AIStateBase
 {
     [Header("Search Settings")]
     public float searchInterval = 5f; // пересчёт пути каждые 5 секунд
-    public float speedIncrement = 0.1f; // ускорение за каждую смену пути
+    public float speedIncrement = 0.3f; // ускорение за каждую смену пути
     public float maxSpeed = 7f; // ускорение за каждую смену пути
     public int targetPlayerEvery = 3; // каждая 3-я итерация на игрока
 
@@ -21,6 +21,16 @@ public class AStarSearch : AIStateBase
         base.Awake();
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         PickRandomTarget();
+    }
+
+    public override void OnStateEnter()
+    {
+        iterationCount = 0;
+        speed = 2.5f;
+        searchTimer = 0f;
+
+        PickRandomTarget();
+        RecalculatePath();
     }
 
     public override void Tick()

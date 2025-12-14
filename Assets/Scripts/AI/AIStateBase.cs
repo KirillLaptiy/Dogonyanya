@@ -175,5 +175,6 @@ public abstract class AIStateBase : MonoBehaviour
         return result;
     }
 
+    public abstract void OnStateEnter();
     public abstract void Tick(); // Каждый стейт реализует свою логику цели
 }
