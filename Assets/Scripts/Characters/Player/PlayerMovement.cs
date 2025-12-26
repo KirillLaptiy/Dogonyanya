@@ -13,8 +13,10 @@ public class PlayerMovement : MonoBehaviour
     private PlayerStamina ps;
 
     private Vector2 lastPosition;
-    private bool isWalking;
-    private bool isRunning;
+    private bool isWalking = false;
+    private bool isRunning = false;
+    public bool IsWalking => isWalking;
+    public bool IsRunning => isRunning;
 
     private void Awake()
     {
@@ -22,8 +24,6 @@ public class PlayerMovement : MonoBehaviour
         ps = GetComponent<PlayerStamina>();
 
         lastPosition = rb.position;
-
-        UpdateMoving();
     }
 
     private void Update()
@@ -76,8 +76,4 @@ public class PlayerMovement : MonoBehaviour
 
         lastPosition = currentPos;
     }
-
-    public bool IsWalking => isWalking;
-
-    public bool IsRunning => isRunning;
 }

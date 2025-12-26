@@ -23,19 +23,14 @@ public class PlayerStamina : MonoBehaviour
         pm = GetComponent<PlayerMovement>();
     }
 
-    void Start()
+    private void Start()
     {
         SetStamina(maxStamina);
     }
 
-    void Update()
+    private void Update()
     {
-        float targetAlpha = shouldShow ? 1f : 0f;
-        staminaCanvasGroup.alpha = Mathf.MoveTowards(
-            staminaCanvasGroup.alpha,
-            targetAlpha,
-            fadeSpeed * Time.deltaTime
-        );
+        UpdateStaminaBarUI();
     }
 
     private void FixedUpdate()
@@ -47,16 +42,15 @@ public class PlayerStamina : MonoBehaviour
             if (pm.IsWalking) staminaToRegen *= 0.5f;
 
             SetStamina(stamina + staminaToRegen * Time.deltaTime);
-            print(stamina);
         }
     }
 
-    public void SetStamina(float stamina)
+    public void SetStamina(float amount)
     {
-        this.stamina = Mathf.Clamp(stamina, 0, maxStamina);
-        staminaSlider.value = this.stamina;
+        stamina = Mathf.Clamp(amount, 0, maxStamina);
+        staminaSlider.value = stamina;
 
-        if (this.stamina >= 99)
+        if (stamina >= 99)
         {
             hideTimer += Time.deltaTime;
             if (hideTimer >= hideDelay)
@@ -70,8 +64,23 @@ public class PlayerStamina : MonoBehaviour
         }
     }
 
+    public void AddStamina(float amount)
+    {
+        SetStamina(stamina + amount);
+    }
+
     public float GetStamina()
     {
         return stamina;
+    }
+
+    private void UpdateStaminaBarUI () {
+        float targetAlpha = shouldShow ? 1f : 0f;
+
+        staminaCanvasGroup.alpha = Mathf.MoveTowards(
+            staminaCanvasGroup.alpha,
+            targetAlpha,
+            fadeSpeed * Time.deltaTime
+        );
     }
 }

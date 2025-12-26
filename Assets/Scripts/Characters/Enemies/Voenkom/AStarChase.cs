@@ -4,21 +4,19 @@ using UnityEngine.Tilemaps;
 [RequireComponent(typeof(Rigidbody2D))]
 public class AStarChase : AIStateBase
 {
-    [Header("Target")]
-    public Transform target; // цель для погони (можно задать в инспекторе)
 
     [Header("Pathfinding")]
     public float recalcInterval = 0.1f;
+
+    private Transform target;
+    private VoenkomVision voenkomVision;
 
     private float recalcTimer;
 
     protected override void Awake()
     {
         base.Awake();
-
-        // Если цель не задана в инспекторе, ищем игрока
-        if (target == null)
-            target = GameObject.FindGameObjectWithTag("Player")?.transform;
+        voenkomVision = GetComponent<VoenkomVision>();
     }
 
     public override void OnStateEnter()
@@ -27,6 +25,8 @@ public class AStarChase : AIStateBase
 
     public override void Tick()
     {
+        target = voenkomVision.getTarget();
+
         if (target == null || groundTilemap == null || obstacleTilemap == null)
             return;
 

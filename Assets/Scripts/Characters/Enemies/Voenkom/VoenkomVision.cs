@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class VoenkomVision : MonoBehaviour
 {
@@ -12,8 +13,11 @@ public class VoenkomVision : MonoBehaviour
 
     private float loseTimer = 0f;
 
-
     private AIController aiController;
+
+    private bool isStunned;
+
+    private Transform target;
 
     void Awake()
     {
@@ -22,6 +26,7 @@ public class VoenkomVision : MonoBehaviour
 
     void Update()
     {
+        if (isStunned) return;
         LookForPlayer();
     }
 
@@ -32,17 +37,27 @@ public class VoenkomVision : MonoBehaviour
         // ---------------- SEARCH ----------------
         if (currentState == AIState.Search)
         {
-            if (CanSeePlayer(out _))
+            if (CanSeePlayer(out Transform seenPlayer))
             {
                 loseTimer = 0f;
+                target = seenPlayer;
                 aiController.SetAIState(AIState.Chase);
+                return;
+            }
+
+            if (CanSeeAlly(out Transform seenAlly))
+            {
+                loseTimer = 0f;
+                target = seenAlly;
+                aiController.SetAIState(AIState.Chase);
+                return;
             }
         }
 
         // ---------------- CHASE ----------------
         else if (currentState == AIState.Chase)
         {
-            if (CanSeePlayer(out _))
+            if (CanSeePlayer(out _) || CanSeeAlly(out _))
             {
                 // Игрок виден → сбрасываем таймер
                 loseTimer = 0f;
@@ -65,29 +80,84 @@ public class VoenkomVision : MonoBehaviour
     {
         seenPlayer = null;
 
+        GameObject player = FindNonBotPlayer();
+        if (player == null) return false;
+
         Vector2 center = transform.position;
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
-        foreach (var player in players)
+        Vector2 playerPos = player.transform.position;
+
+        // Проверка зоны обзора
+        if (Mathf.Abs(playerPos.x - center.x) > viewWidth / 2) return false;
+        if (Mathf.Abs(playerPos.y - center.y) > viewHeight / 2) return false;
+
+        Vector2 dir = (playerPos - center).normalized;
+        float dist = Vector2.Distance(center, playerPos);
+
+        // Проверка стен
+        if (!Physics2D.Raycast(center, dir, dist, obstacleLayer))
         {
-            Vector2 playerPos = player.transform.position;
-
-            // Проверка зоны обзора
-            if (Mathf.Abs(playerPos.x - center.x) > viewWidth / 2) continue;
-            if (Mathf.Abs(playerPos.y - center.y) > viewHeight / 2) continue;
-
-            Vector2 dir = (playerPos - center).normalized;
-            float dist = Vector2.Distance(center, playerPos);
-
-            // Проверка стен
-            if (!Physics2D.Raycast(center, dir, dist, obstacleLayer))
-            {
-                seenPlayer = player.transform;
-                return true;
-            }
+            seenPlayer = player.transform;
+            return true;
         }
 
         return false;
+    }
+
+    bool CanSeeAlly(out Transform seenAlly)
+    {
+        seenAlly = null;
+
+        GameObject player = FindAlly();
+        if (player == null) return false;
+
+        Vector2 center = transform.position;
+
+        Vector2 playerPos = player.transform.position;
+
+        // Проверка зоны обзора
+        if (Mathf.Abs(playerPos.x - center.x) > viewWidth / 2) return false;
+        if (Mathf.Abs(playerPos.y - center.y) > viewHeight / 2) return false;
+
+        Vector2 dir = (playerPos - center).normalized;
+        float dist = Vector2.Distance(center, playerPos);
+
+        // Проверка стен
+        if (!Physics2D.Raycast(center, dir, dist, obstacleLayer))
+        {
+            seenAlly = player.transform;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void SetStunned(bool stunned)
+    {
+        isStunned = stunned;
+    }
+
+    public Transform getTarget()
+    {
+        return target;
+    }
+
+    GameObject FindAlly()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject humanPlayer = players.FirstOrDefault(p =>
+            p.TryGetComponent<AkulaVision>(out var stamina)
+        );
+        return humanPlayer;
+    }
+
+    GameObject FindNonBotPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject humanPlayer = players.FirstOrDefault(p =>
+            p.TryGetComponent<PlayerStamina>(out var stamina)
+        );
+        return humanPlayer;
     }
 
 

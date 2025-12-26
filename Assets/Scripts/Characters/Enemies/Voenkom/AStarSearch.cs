@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -19,7 +20,7 @@ public class AStarSearch : AIStateBase
     protected override void Awake()
     {
         base.Awake();
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        player = FindNonBotPlayer().transform;
         PickRandomTarget();
     }
 
@@ -101,5 +102,14 @@ public class AStarSearch : AIStateBase
 
         path = newPath;
         currentNode = 0;
+    }
+
+    GameObject FindNonBotPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject humanPlayer = players.FirstOrDefault(p =>
+            p.TryGetComponent<PlayerStamina>(out var stamina)
+        );
+        return humanPlayer;
     }
 }
