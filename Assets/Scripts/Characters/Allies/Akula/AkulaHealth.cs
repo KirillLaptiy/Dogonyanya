@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,6 @@ namespace Characters.Allies.Akula
         private void Awake()
         {
             Init(maxHP);
-
             UpdateHealth();
         }
 

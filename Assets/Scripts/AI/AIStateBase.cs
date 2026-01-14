@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,21 +8,26 @@ public abstract class AIStateBase : MonoBehaviour
     [Header("Movement")]
     public float speed = 2.5f;
     public float reachThreshold = 1f;
-
-    [Header("Tilemap")]
-    public Tilemap groundTilemap;
-    public Tilemap obstacleTilemap;
-
+    
     [Header("Collision")]
     public LayerMask obstacleMask;
 
     protected Rigidbody2D rb;
     protected List<Vector3> path = new List<Vector3>();
     protected int currentNode = 0;
+    
+    protected Tilemap groundTilemap;
+    protected Tilemap obstacleTilemap;
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+    
+    protected virtual void Start()
+    {
+        groundTilemap = TilemapManager.Instance.groundTilemap;
+        obstacleTilemap = TilemapManager.Instance.obstacleTilemap;
     }
 
     protected void MoveAlongPath()

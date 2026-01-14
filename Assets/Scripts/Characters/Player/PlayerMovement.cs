@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Characters.Player;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]

@@ -11,11 +11,14 @@ public class VoenkomHitCharacter : MonoBehaviour
 
     private VoenkomHealth vh;
 
+    [SerializeField] private AudioSource audioSource;
+    
     private bool isStunned = false;
 
     private void Awake()
     {
         vh = GetComponent<VoenkomHealth>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -29,6 +32,8 @@ public class VoenkomHitCharacter : MonoBehaviour
         // Проверяем кулдаун
         if (Time.time < lastAttackTime + attackCooldown)
             return;
+        
+        PlayEnemySound();
 
         bool hitAlly = false;
 
@@ -53,5 +58,10 @@ public class VoenkomHitCharacter : MonoBehaviour
     public void SetStunned(bool stunned)
     {
         isStunned = stunned;
+    }
+    
+    public void PlayEnemySound()
+    {
+        audioSource.Play();
     }
 }

@@ -1,86 +1,89 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerStamina : MonoBehaviour
+namespace Characters.Player
 {
-    public float maxStamina = 100f;
-    public float regenPerSecond = 2f;
-
-    [Header("Stamina Slider")]
-    public float fadeSpeed = 5f;
-    public float hideDelay = 0.5f;
-    public Slider staminaSlider;
-    public CanvasGroup staminaCanvasGroup;
-
-    private PlayerMovement pm;
-    private float stamina;
-
-    private float hideTimer = 0f;
-    private bool shouldShow = false;
-
-    private void Awake()
+    public class PlayerStamina : MonoBehaviour
     {
-        pm = GetComponent<PlayerMovement>();
-    }
+        public float maxStamina = 100f;
+        public float regenPerSecond = 2f;
 
-    private void Start()
-    {
-        SetStamina(maxStamina);
-    }
+        [Header("Stamina Slider")]
+        public float fadeSpeed = 5f;
+        public float hideDelay = 0.5f;
+        public Slider staminaSlider;
+        public CanvasGroup staminaCanvasGroup;
 
-    private void Update()
-    {
-        UpdateStaminaBarUI();
-    }
+        private PlayerMovement pm;
+        private float stamina;
 
-    private void FixedUpdate()
-    {
-        if (!pm.IsRunning)
+        private float hideTimer = 0f;
+        private bool shouldShow = false;
+
+        private void Awake()
         {
-            float staminaToRegen = regenPerSecond;
-
-            if (pm.IsWalking) staminaToRegen *= 0.5f;
-
-            SetStamina(stamina + staminaToRegen * Time.deltaTime);
-        }
-    }
-
-    public void SetStamina(float amount)
-    {
-        stamina = Mathf.Clamp(amount, 0, maxStamina);
-        staminaSlider.value = stamina;
-
-        if (stamina >= 99)
-        {
-            hideTimer += Time.deltaTime;
-            if (hideTimer >= hideDelay)
-                shouldShow = false;
+            pm = GetComponent<PlayerMovement>();
         }
 
-        else
+        private void Start()
         {
-            hideTimer = 0f;
-            shouldShow = true;
+            SetStamina(maxStamina);
         }
-    }
 
-    public void AddStamina(float amount)
-    {
-        SetStamina(stamina + amount);
-    }
+        private void Update()
+        {
+            UpdateStaminaBarUI();
+        }
 
-    public float GetStamina()
-    {
-        return stamina;
-    }
+        private void FixedUpdate()
+        {
+            if (!pm.IsRunning)
+            {
+                float staminaToRegen = regenPerSecond;
 
-    private void UpdateStaminaBarUI () {
-        float targetAlpha = shouldShow ? 1f : 0f;
+                if (pm.IsWalking) staminaToRegen *= 0.5f;
 
-        staminaCanvasGroup.alpha = Mathf.MoveTowards(
-            staminaCanvasGroup.alpha,
-            targetAlpha,
-            fadeSpeed * Time.deltaTime
-        );
+                SetStamina(stamina + staminaToRegen * Time.deltaTime);
+            }
+        }
+
+        public void SetStamina(float amount)
+        {
+            stamina = Mathf.Clamp(amount, 0, maxStamina);
+            staminaSlider.value = stamina;
+
+            if (stamina >= 99)
+            {
+                hideTimer += Time.deltaTime;
+                if (hideTimer >= hideDelay)
+                    shouldShow = false;
+            }
+
+            else
+            {
+                hideTimer = 0f;
+                shouldShow = true;
+            }
+        }
+
+        public void AddStamina(float amount)
+        {
+            SetStamina(stamina + amount);
+        }
+
+        public float GetStamina()
+        {
+            return stamina;
+        }
+
+        private void UpdateStaminaBarUI () {
+            float targetAlpha = shouldShow ? 1f : 0f;
+
+            staminaCanvasGroup.alpha = Mathf.MoveTowards(
+                staminaCanvasGroup.alpha,
+                targetAlpha,
+                fadeSpeed * Time.deltaTime
+            );
+        }
     }
 }

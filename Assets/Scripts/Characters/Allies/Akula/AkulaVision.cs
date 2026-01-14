@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -10,14 +11,22 @@ public class AkulaVision : MonoBehaviour
     public string enemyTag = "Enemy";
 
     private AIController aiController;
-    private AStarFoodPlace foodPlace;
+    // private AStarFoodPlace foodPlace;
 
     private Transform parasiteTransform;
+    private AudioSource _audioSource;
 
     void Awake()
     {
         aiController = GetComponent<AIController>();
-        foodPlace = GetComponent<AStarFoodPlace>();
+        _audioSource = GetComponent<AudioSource>();
+        // foodPlace = GetComponent<AStarFoodPlace>();
+    }
+
+    private void Start()
+    {
+        var audioManager = AudioManager.Instance;
+        audioManager.PlayAllySpawnSound(_audioSource);
     }
 
     void Update()
@@ -27,7 +36,7 @@ public class AkulaVision : MonoBehaviour
 
     void LookForCharacters()
     {
-        foodPlace.TryPlaceFood();
+        // foodPlace.TryPlaceFood();
 
         bool seeEnemy = CanSeeEnemy(enemyTag);
         AIState currentState = aiController.GetAIState();

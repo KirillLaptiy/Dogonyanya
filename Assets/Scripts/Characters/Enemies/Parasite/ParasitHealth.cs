@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,26 +10,33 @@ public class ParasitHealth : MonoBehaviour
     public int currentHP = 2;
     public Sprite fullHeart;
     public Sprite emptyHeart;
-
     public GameObject heartPrefab; // Image ? ???????
     public Transform healthBar;     // ?????????
-
     public float attackCooldown = 3f;
-
-
+    
     private float lastAttackTime = -999f;
-
     private ParasitFlee parasitFlee;
-
     private List<GameObject> hearts = new List<GameObject>();
-    public int GetHealth => currentHP;
     private Coroutine speedBoostRoutine;
+    private AudioManager _audioManager;
+    [SerializeField] private AudioSource audioSource;
+    public int GetHealth => currentHP;
+
+    private bool isSpeedBoosted;
 
     private void Awake()
     {
         parasitFlee = GetComponent<ParasitFlee>();
+        audioSource = GetComponent<AudioSource>();
+        
         Init(maxHP);
         UpdateHealth();
+    }
+
+    private void Start()
+    {
+        _audioManager = AudioManager.Instance;
+        _audioManager.PlayParasiteSpawnSound(audioSource);
     }
 
     public void Init(int maxHealth)
@@ -83,25 +91,27 @@ public class ParasitHealth : MonoBehaviour
 
     private void Die()
     {
+        _audioManager.PlayTemporaryHitSound(audioSource);
         Destroy(gameObject);
     }
 
     void StartSpeedBoost()
     {
-        if (speedBoostRoutine != null)
-            StopCoroutine(speedBoostRoutine);
-
+        if (isSpeedBoosted)
+            return;
+        
         speedBoostRoutine = StartCoroutine(SpeedBoostCoroutine());
     }
 
     IEnumerator SpeedBoostCoroutine()
     {
+        isSpeedBoosted = true;
         parasitFlee.IncreaseSpeed(3f);
 
         yield return new WaitForSeconds(attackCooldown);
 
         parasitFlee.DecreaseSpeed(3f);
-
+        isSpeedBoosted = false;
         speedBoostRoutine = null;
     }
 
@@ -115,6 +125,8 @@ public class ParasitHealth : MonoBehaviour
         // ????????? ???????
         if (Time.time < lastAttackTime + attackCooldown)
             return;
+
+        _audioManager.PlayHitSound(audioSource);
 
         // ??????? ????
         if (other.TryGetComponent(out PlayerHealth _) || other.TryGetComponent(out AkulaHealth _))

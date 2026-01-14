@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Characters.Player;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,10 +8,10 @@ using UnityEngine.Tilemaps;
 public class AStarSearch : AIStateBase
 {
     [Header("Search Settings")]
-    public float searchInterval = 5f; // пересчёт пути каждые 5 секунд
-    public float speedIncrement = 0.3f; // ускорение за каждую смену пути
-    public float maxSpeed = 7f; // ускорение за каждую смену пути
-    public int targetPlayerEvery = 3; // каждая 3-я итерация на игрока
+    public float searchInterval = 5f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 5 пїЅпїЅпїЅпїЅпїЅпїЅ
+    public float speedIncrement = 0.3f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+    public float maxSpeed = 7f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+    public int targetPlayerEvery = 3; // пїЅпїЅпїЅпїЅпїЅпїЅ 3-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
     private float searchTimer = 0f;
     private Vector3 targetPosition;
@@ -40,13 +41,13 @@ public class AStarSearch : AIStateBase
 
         searchTimer -= Time.deltaTime;
 
-        // Если дошли до конца пути или прошло время
+        // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         bool needNewPath = path.Count == 0 || currentNode >= path.Count || searchTimer <= 0f;
         if (needNewPath)
         {
             iterationCount++;
 
-            // Каждая N-я итерация выбираем игрока как цель
+            // пїЅпїЅпїЅпїЅпїЅпїЅ N-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
             if (player != null && iterationCount % targetPlayerEvery == 0)
             {
                 targetPosition = player.position;
@@ -59,7 +60,7 @@ public class AStarSearch : AIStateBase
             RecalculatePath();
             searchTimer = searchInterval;
 
-            // Ускоряем врага
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
             if (speed < maxSpeed) { speed += speedIncrement; }
         }
 
@@ -80,7 +81,7 @@ public class AStarSearch : AIStateBase
             randomPos = groundTilemap.CellToWorld(new Vector3Int((int)randX, (int)randY, 0));
 
             attempts++;
-            if (attempts > 50) break; // чтобы не зациклиться
+            if (attempts > 50) break; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
         } while (!groundTilemap.HasTile(groundTilemap.WorldToCell(randomPos)) ||
                  obstacleTilemap.HasTile(groundTilemap.WorldToCell(randomPos)));
@@ -96,7 +97,7 @@ public class AStarSearch : AIStateBase
         var newPath = FindPath(startCell, targetCell);
         if (newPath.Count == 0) return;
 
-        // Убираем первый узел, если слишком близко
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         if (Vector3.Distance(newPath[0], rb.position) < reachThreshold)
             newPath.RemoveAt(0);
 

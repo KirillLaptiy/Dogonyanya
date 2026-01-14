@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Characters.Player;
 using UnityEngine;
 
 public class VoenkomVision : MonoBehaviour
@@ -35,22 +36,21 @@ public class VoenkomVision : MonoBehaviour
         AIState currentState = aiController.GetAIState();
 
         // ---------------- SEARCH ----------------
+        if (CanSeePlayer(out Transform seenPlayer))
+        {
+            target = seenPlayer;
+        }
+        
+        if (CanSeeAlly(out Transform seenAlly))
+        {
+            target = seenAlly;
+        }
+        
         if (currentState == AIState.Search)
         {
-            if (CanSeePlayer(out Transform seenPlayer))
+            if (CanSeeAlly(out _) || CanSeePlayer(out _))
             {
-                loseTimer = 0f;
-                target = seenPlayer;
                 aiController.SetAIState(AIState.Chase);
-                return;
-            }
-
-            if (CanSeeAlly(out Transform seenAlly))
-            {
-                loseTimer = 0f;
-                target = seenAlly;
-                aiController.SetAIState(AIState.Chase);
-                return;
             }
         }
 

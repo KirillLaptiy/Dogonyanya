@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Characters.Player;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -124,6 +125,6 @@ public class ParasitVision : MonoBehaviour
     {
         if (target == null) return true;
         float dist = Vector3.Distance(transform.position, target.position);
-        return dist >= (((viewWidth + viewHeight) / 2) + 2f);
+        return dist >= (((viewWidth + viewHeight) / 2) + 1f);
     }
 }

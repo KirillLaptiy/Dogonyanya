@@ -118,7 +118,7 @@ public class AStarFoodPlace : AIStateBase
         }
     }
 
-    public void TryPlaceFood()
+    private void TryPlaceFood()
     {
         Vector3Int currentCell = WorldToCell(transform.position);
 

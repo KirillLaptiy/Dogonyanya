@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Characters.Player;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,17 +11,20 @@ public class PlayerHealth : MonoBehaviour
     public int currentHP = 5;
     public Sprite fullHeart;
     public Sprite emptyHeart;
+    public AudioClip hitClip;
 
-    public GameObject heartPrefab; // Image с сердцем
-    public Transform healthBar;     // контейнер
+    public GameObject heartPrefab; // Image пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    public Transform healthBar;     // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-    private List<GameObject> hearts = new List<GameObject>();
+    private List<Image> hearts = new List<Image>();
+    private AudioSource source;
 
     private PlayerStamina ps;
     public int GetHealth => currentHP;
     private void Awake()
     {
         ps = GetComponent<PlayerStamina>();
+        source = GetComponent<AudioSource>();
 
         Init(maxHP);
 
@@ -29,7 +33,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void Init(int maxHealth)
     {
-        // очищаем старые сердца
+        // РЈРґР°Р»СЏРµРј СЃС‚Р°СЂС‹Рµ СЃРµСЂРґС†Р°
         foreach (Transform child in healthBar)
             Destroy(child.gameObject);
 
@@ -38,26 +42,27 @@ public class PlayerHealth : MonoBehaviour
         for (int i = 0; i < maxHealth; i++)
         {
             GameObject heartGO = Instantiate(heartPrefab, healthBar);
-            //Image img = heartGO.GetComponent<Image>();
-            //img.sprite = fullHeart;
-            hearts.Add(heartGO);
+            RectTransform rt = heartGO.GetComponent<RectTransform>();
+
+            rt.localScale = Vector3.one;
+            rt.sizeDelta = new Vector2(50, 50); // СЂР°Р·РјРµСЂ СЃРµСЂРґС†Р° РІ UI
+            rt.anchoredPosition = new Vector2(i * 55, 0); // РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ СЂСЏРґ, СЂР°СЃСЃС‚РѕСЏРЅРёРµ 55 px
+
+            Image img = heartGO.GetComponent<Image>();
+            img.sprite = fullHeart;
+
+            hearts.Add(img);
         }
     }
+
     public void UpdateHealth()
     {
         for (int i = 0; i < hearts.Count; i++)
         {
-            SpriteRenderer heartImage = hearts[i].GetComponent<SpriteRenderer>();
-
-            if (i >= (currentHP))
-            {
-                heartImage.sprite = emptyHeart;
-            }
-
+            if (i >= currentHP)
+                hearts[i].sprite = emptyHeart;
             else
-            {
-                heartImage.sprite = fullHeart;
-            }
+                hearts[i].sprite = fullHeart;
         }
     }
 
@@ -74,6 +79,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        source.PlayOneShot(hitClip, 0.7f);
         SetHealth(currentHP - damage);
         ps.SetStamina(100);
     }
