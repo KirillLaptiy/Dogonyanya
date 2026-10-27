@@ -1,2 +1,2 @@
 # Dogonyanya
-My first unity game with AI
+My first unity game
